@@ -1,0 +1,396 @@
+﻿/// <reference path="jquery-1.4.1.min.js" /> 
+
+
+var msgBoxImagePath = "../JS/MessageBox/images/"
+var ClosemsgBox = true;
+
+function IsmsgBoxColse(blnvisible) {
+
+    ClosemsgBox = blnvisible;
+}
+
+jQuery.msgBox = msg;
+function msg(options) {
+    var isShown = false;
+    var typeOfValue = typeof options;
+    var defaults = {
+        content: (typeOfValue == "string" ? options : "Message"),
+        title: "Warning",
+        type: "alert",
+        autoClose: false,
+        timeOut:0, 
+		msgSize:"430px",
+        showButtons: true,
+        buttons: [{ value: "Ok"}],
+        inputs: [{ type: "text", name: "userName", header: "User Name" }, { type: "password", name: "password", header: "Password"}],
+        success: function (result) { },
+        beforeShow: function () { },
+        afterShow: function () { },
+        beforeClose: function () { },
+        afterClose: function () { },
+        opacity: 0.1
+    };
+    options = typeOfValue == "string" ? defaults : options;
+    if (options.type != null) {
+        switch (options.type) {
+            case "alert":
+                options.title = options.title == null ? "Warning" : options.title;
+                break;
+            case "info":
+                options.title = options.title == null ? "Information" : options.title;
+                break;
+            case "error":
+                options.title = options.title == null ? "Error" : options.title;
+                break;
+            case "confirm":
+                options.title = options.title == null ? "Confirmation" : options.title;
+                options.buttons = options.buttons == null ? [{ value: "Yes" }, { value: "No" }, { value: "Cancel"}] : options.buttons;
+                break;
+            case "prompt":
+                options.title = options.title == null ? "Log In" : options.title;
+                options.buttons = options.buttons == null ? [{ value: "Login" }, { value: "Cancel"}] : options.buttons;
+                break;
+            default:
+                image = "alert.png";
+        }
+    }
+    options.timeOut = options.timeOut == null ? (options.content == null ? 500 : options.content.length * 70) : options.timeOut; 
+	options.msgSize=options.msgSize?options.msgSize:defaults.msgSize;
+	
+    options = $.extend(defaults, options);
+    if (options.autoClose) {
+        setTimeout(hide, options.timeOut);
+    }
+    var image = "";
+    switch (options.type) {
+        case "alert":
+            image = "alert.png";
+            break;
+        case "info":
+            image = "info.png";
+            break;
+        case "error":
+            image = "error.png";
+            break;
+        case "confirm":
+            image = "confirm.png";
+            break;
+        default:
+            image = "alert.png";
+    }
+
+    var divId = "msgBox" + new Date().getTime(); 
+    var divMsgBoxId = divId;
+    var divMsgBoxContentId = divId + "Content";
+    var divMsgBoxImageId = divId + "Image";
+    var divMsgBoxButtonsId = divId + "Buttons";
+    var divMsgBoxBackGroundId = divId + "BackGround";
+
+    var buttons = "";
+    $(options.buttons).each(function (index, button) {
+        buttons += "<input class=\"msgButton\" type=\"button\" name=\"" + button.value + "\" value=\"" + button.value + "\" />";
+    });
+
+    var inputs = "";
+    $(options.inputs).each(function (index, input) {
+        var type = input.type;
+        if (type == "checkbox" || type == "radiobutton") {
+            inputs += "<div class=\"msgInput\">" +
+            "<input type=\"" + input.type + "\" name=\"" + input.name + "\" " + (input.checked == null ? "" : "checked ='" + input.checked + "'") + " value=\"" + (typeof input.value == "undefined" ? "" : input.value) + "\" />" +
+            "<text>" + input.header + "</text>" +
+            "</div>";
+        }
+        else {
+            inputs += "<div class=\"msgInput\">" +
+            "<span class=\"msgInputHeader\">" + input.header + "<span>" +
+            "<input type=\"" + input.type + "\" name=\"" + input.name + "\" value=\"" + (typeof input.value == "undefined" ? "" : input.value) + "\" />" +
+            "</div>";
+        }
+    });
+    var divBackGround = "<div id=" + divMsgBoxBackGroundId + " class=\"msgBoxBackGround\"></div>";
+    var divTitle = "<div class=\"msgBoxTitle\">" + options.title + "</div>";
+	
+    var divContainer = "<div class=\"msgBoxContainer\"><div id=" + divMsgBoxImageId + " class=\"msgBoxImage\"><img src=\"" + msgBoxImagePath + image + "\"/></div><div id=" + divMsgBoxContentId 
+	+ " class=\""+ (options.msgSize=="430px"?"msgBoxContent":"msgBoxContent_lrge")+"\"><p><span>" + options.content + "</span></p></div></div>";
+    var divButtons = "<div id=" + divMsgBoxButtonsId + " class=\"msgBoxButtons\">" + buttons + "</div>";
+    var divInputs = "<div class=\"msgBoxInputs\">" + inputs + "</div>";
+     
+    var divMsgBox;
+    var divMsgBoxContent;
+    var divMsgBoxImage;
+    var divMsgBoxButtons;
+    var divMsgBoxBackGround;
+
+    if (options.type == "prompt") {
+        $("body").append(divBackGround + "<div style='width:"+ options.msgSize +"' id=" + divMsgBoxId + " class=\"msgBox\">" + divTitle + "<div>" + divContainer + (options.showButtons ? divButtons + "</div>" : "</div>") + "</div>");
+        divMsgBox = $("#" + divMsgBoxId);
+        divMsgBoxContent = $("#" + divMsgBoxContentId);
+        divMsgBoxImage = $("#" + divMsgBoxImageId);
+        divMsgBoxButtons = $("#" + divMsgBoxButtonsId);
+        divMsgBoxBackGround = $("#" + divMsgBoxBackGroundId);
+
+        divMsgBoxImage.remove();
+        divMsgBoxButtons.css({ "text-align": "center", "margin-top": "5px" });
+        divMsgBoxContent.css({ "width": "100%", "height": "100%" });
+        divMsgBoxContent.html(divInputs);
+    }
+    else {
+        $("body").append(divBackGround + "<div style='width:"+ options.msgSize +"' id=" + divMsgBoxId + " class=\"msgBox\">" + divTitle + "<div>" + divContainer + (options.showButtons ? divButtons + "</div>" : "</div>") + "</div>");
+        divMsgBox = $("#" + divMsgBoxId);
+        divMsgBoxContent = $("#" + divMsgBoxContentId);
+        divMsgBoxImage = $("#" + divMsgBoxImageId);
+        divMsgBoxButtons = $("#" + divMsgBoxButtonsId);
+        divMsgBoxBackGround = $("#" + divMsgBoxBackGroundId);
+    }
+
+    var width = divMsgBox.width();
+    var height = divMsgBox.height();
+    var windowHeight = $(window).height();
+    var windowWidth = $(window).width();
+
+    var top = windowHeight / 2 - height / 2;
+    var left = windowWidth / 2 - width / 2;
+
+    show();
+
+    function show() {
+        if (isShown) {
+            return;
+        }
+        divMsgBox.css({ opacity: 0, top: top - 50, left: left });
+        divMsgBox.css("background-image", "url('" + msgBoxImagePath + "msgBoxBackGround.png')");
+        divMsgBoxBackGround.css({ opacity: options.opacity });
+        options.beforeShow();
+
+        //divMsgBoxBackGround.css({ "width": ($(document).width()-21), "height": getDocHeight() });
+        divMsgBoxBackGround.css({ "width": $(document).width() });
+
+        $(divMsgBoxId + "," + divMsgBoxBackGroundId).fadeIn(0);
+        divMsgBox.animate({ opacity: 1, "top": top, "left": left }, 200);
+        setTimeout(options.afterShow, 200);
+        isShown = true;
+        $(window).bind("resize", function (e) {
+            var width = divMsgBox.width();
+            var height = divMsgBox.height();
+            var windowHeight = $(window).height();
+            var windowWidth = $(window).width();
+
+            var top = windowHeight / 2 - height / 2;
+            var left = windowWidth / 2 - width / 2;
+
+            divMsgBox.css({ "top": top, "left": left });
+        });
+    }
+
+    function hide() {
+        if (!isShown || !ClosemsgBox) {
+            return;
+        }
+        options.beforeClose();
+        divMsgBox.animate({ opacity: 0, "top": top - 50, "left": left }, 200);
+        divMsgBoxBackGround.fadeOut(300);
+        setTimeout(function () { divMsgBox.remove(); divMsgBoxBackGround.remove(); }, 300);
+        setTimeout(options.afterClose, 300);
+        isShown = false;
+    }
+
+    function getDocHeight() {
+        var D = document;
+        return Math.max(
+        Math.max(D.body.scrollHeight, D.documentElement.scrollHeight),
+        Math.max(D.body.offsetHeight, D.documentElement.offsetHeight),
+        Math.max(D.body.clientHeight, D.documentElement.clientHeight));
+    }
+
+    function getFocus() {
+        divMsgBox.fadeOut(200).fadeIn(200);
+    }
+
+    $("input.msgButton").click(function (e) {
+        e.preventDefault();
+        var value = $(this).val();
+        if (options.type != "prompt") {
+            options.success(value);
+        }
+        else {
+            var inputValues = [];
+            $("div.msgInput input").each(function (index, domEle) {
+                var name = $(this).attr("name");
+                var value = $(this).val();
+                var type = $(this).attr("type");
+                if (type == "checkbox" || type == "radiobutton") {
+                    inputValues.push({ name: name, value: value, checked: $(this).attr("checked") });
+                }
+                else {
+                    inputValues.push({ name: name, value: value });
+                }
+            });
+            options.success(value, inputValues);
+        }
+        hide();
+    });
+
+    divMsgBoxBackGround.click(function (e) {
+        if (!options.showButtons || options.autoClose) {
+            hide();
+        }
+        else {
+            getFocus();
+        }
+    });
+};
+
+//jQuery.msgBox.Show = msgBox;
+
+function msgBox(_title, _content, _type, _action, _autoClose,_msgSize) {
+
+    if (jQuery.msgBox == undefined)
+        jQuery.msgBox = msg;
+ 
+    //    type: info, error, confirm
+    try {
+
+        if (_autoClose == true) 
+        {
+
+            $.msgBox({
+                title: _title,
+                content: _content,
+                type: _type,
+                opacity: 0.4,
+                showButtons:false,
+                autoClose: _autoClose ,
+                timeOut: 1800, 
+            });
+
+            if (_action != undefined) eval("window.setTimeout('" + _action + "',1800)");
+            
+        } 
+        else if (_type == "confirm") 
+        {
+            $.msgBox({
+                title: _title,
+                content: _content,
+                type: _type,
+                opacity: 0.4, 
+                buttons: [{ value: "Yes" }, { value: "No"}],
+                success: function (result)
+                {
+                    if (result == "Yes" && _action != undefined)
+                    {
+
+                        if (_action.name || _action.id) {
+                            var senderName = _action.name ? _action.name : functions.replaceAll(_action.id, '_', '$');
+
+                            __doPostBack(senderName, '');
+                        }
+                        else {
+                            eval(_action);
+                        }
+                    }
+                }
+            });
+
+             if (document.getElementsByName('Yes').length != 0)
+                document.getElementsByName('Yes').item(0).focus();
+        }
+        else if (_type == "confirmOK") {
+            $.msgBox({
+                title: _title,
+                content: _content,
+                type: _type,
+                opacity: 0.4,
+                buttons: [{ value: "Ok" }],
+                success: function (result) {
+                    if (result == "Ok" && _action != undefined) {
+                        var senderName = _action.name ? _action.name : functions.replaceAll(_action.id, '_', '$');
+
+                        __doPostBack(senderName, '');
+                    }
+                }
+            });
+
+            if (document.getElementsByName('Ok').length != 0)
+                document.getElementsByName('Ok').item(0).focus();
+        }
+        else {
+            $.msgBox({
+                title: _title,
+                content: _content,
+                type: _type,
+                opacity: 0.4, 
+				msgSize:_msgSize,
+                autoClose: _autoClose,
+                buttons: [{ value: "Ok"}],
+                success: function (result) {
+                    if (_action != undefined) eval(_action);
+                }
+            });
+
+            if (document.getElementsByName('Ok').length != 0)
+                document.getElementsByName('Ok').item(0).focus(); 
+        }
+    }
+    catch (ex) { }
+}
+  // <a href="#" class="alert_close" >×</a>
+    // <strong>Success!</strong> This alert box could indicate a successful or positive action.
+ 
+ var prevalertfocusid;
+ 
+function alertBox(_alertid,_content, _type, _alertfocusid,_autoclose) 
+{
+	var alertBoxSender= functions.getElement(_alertid);
+	
+	alertBoxSender.style.display = "none";
+	
+	if (_type == "warning") alertBoxSender.className = "alert alert_warning";
+	else if (_type == "danger") alertBoxSender.className = "alert alert_danger";
+	else if (_type == "success") alertBoxSender.className = "alert alert_success";
+	else alertBoxSender.className = "alert alert_info";
+	
+	if(prevalertfocusid) prevalertfocusid.style.borderColor=""; 
+	
+	alertBoxSender.innerHTML = '<a onclick="closeAlertBox(\'' + _alertid + '\');" class="alert_close" >×</a>' + _content; 
+	 
+	$(alertBoxSender).slideDown();
+	 
+	$('body, html').animate({ scrollTop: 0 },{
+        duration: 500,
+        complete: function () {
+         alertFocus(_alertfocusid);
+        }
+	});
+	 
+	 // if (_alertfocusid != undefined) eval("window.setTimeout(alertFocus('" + _alertfocusid + "'),1800)"); 
+	  
+	// if(_autoclose)
+	// {
+		// setTimeout(closeAlertBox( _alertid ),88888888);
+	// }
+}
+function alertFocus(_alertfocusid)
+{
+    var alertfocusid = functions.getElement(_alertfocusid);
+    if (alertfocusid) {
+        prevalertfocusid = alertfocusid;
+        alertfocusid.style.borderColor = "red";
+        alertfocusid.focus();
+        // position: 'absolute'
+        $(alertfocusid)
+            .css({
+                position: 'relative'
+            }).animate({ top: '-10' }).animate({
+                top: '0'
+            });
+    }
+	
+	// $(alertfocusid).fadeOut();
+	// $(alertfocusid).fadeIn();
+}
+function closeAlertBox(_alertid)
+{
+	var alertBox= functions.getElement(_alertid);
+	alertBox.innerHTML="";
+	$(alertBox).slideUp();
+}

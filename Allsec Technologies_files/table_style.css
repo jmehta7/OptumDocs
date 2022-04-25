@@ -1,0 +1,333 @@
+
+body { 
+	font: 11px; 
+}
+/* Employee Grid */
+.emp_grid { 
+		border-collapse: collapse; 
+		font-size:12px !important;
+	}
+.emp_grid td,th { 
+		padding: 5px; 
+		border: 1px solid #ccc;
+		/*text-align: left; 
+		width:25%;*/
+		font-size:11px !important;
+	}
+.emp_gridbg
+{
+	background:#eeeeee;
+	}
+.emp_gridheader
+{
+	background:#00629b;
+	color:white;
+}
+.emp_gridcmp
+{
+	background:#00629b;
+	color:white !important;
+}
+/* Employee Grid */
+
+#page-wrap {
+	margin: 5px;
+}
+	/* 
+	Generic Styling, for Desktops/Laptops 
+	*/
+	.dt_table
+	{
+		width:850px;
+		margin-top:10px;
+	}
+	.header { 
+		width: 850px; 
+		border-collapse: collapse; 
+		font-size:11px !important;
+	}
+	/* Zebra striping */
+	/*.header th { 
+		background: #333; 
+		color: white; 
+		font-weight: bold; 
+	}*/
+	.helpdesk th { 
+		background: #00629b; 
+		color: white !important; 
+		/*white-space:nowrap;*/
+		font-size:11px;
+		font-weight: bold; 
+	}
+	.header td,th { 
+		padding: 3px; 
+		border: 1px solid #000;
+		text-align: left; 
+		/*width:25%;*/
+		font-size:11px !important;
+	}
+	.display
+	{
+		width:50%;
+		border:1px solid #cccccc;
+		border-right:none;
+		font-size:11px !important;		
+		/*padding:2px !important;*/
+	}
+	.display1
+	{
+		width:50%;
+		border:1px solid #cccccc;
+		font-size:11px !important;		
+		/*padding:2px !important;*/
+	}
+	.org_color
+	{
+		background-color:#4b5d67;
+		color:white !important;
+		font-size:11px !important;
+	}
+	.gray_color
+	{
+		background-color:#f1f1f1;
+		font-size:11px !important;		
+	}
+	.white_color
+	{
+		background-color:#FFF;
+		font-size:11px !important;		
+	}
+	.cyan_color
+	{
+		background-color:#5bc0de;
+		color:#FFF !important;
+	}
+	.copyl
+	{
+		border-left:1px solid #cccccc;
+				font-size:11px !important;
+	}
+	.copy
+	{
+		font-size:11px !important;
+	}
+	.copyt
+	{
+		border-top:1px solid #cccccc;
+				font-size:11px !important;
+	}
+	.copyb
+	{
+		border-bottom:1px solid #cccccc;
+				font-size:11px !important;
+	}
+	.copylb
+	{
+		border-left:1px solid #cccccc;
+		border-bottom:1px solid #cccccc;
+				font-size:11px !important;
+	}
+	.copylt
+	{
+		border-left:1px solid #cccccc;
+		border-top:1px solid #cccccc;
+				font-size:11px !important;
+	}
+	/*payslip*/
+	.copyltb
+	{  font-family:"Open Sans",sans-serif !important;
+		font-size: 11px;
+		color: #000;
+		text-decoration: none;
+		border-top-width:1px;
+		border-top-style:solid;
+		border-bottom-width:1px;
+		border-bottom-style:solid;
+		border-right-width:0;
+		border-LEFT-style:solid;
+		border-LEFT-width:1px;
+		border-color:#585858;
+	}
+	
+	
+	
+		body { 
+			padding: 0; 
+			margin: 0; 
+			width: 100% }
+		}
+	
+	/* Helpdesk CSS SART */
+	
+	
+	/* 
+	Generic Styling, for Desktops/Laptops 
+	*/
+	.helpdesk { 
+		width: 100%; 
+		border-collapse: collapse; 
+	}
+	/* Zebra striping */
+	.helpdesk tr:nth-of-type(odd) { 
+		background: #f9f9f9; 
+	}
+	.helpdesk th { 
+		background: #00629b; 
+		color: white !important; 
+		/*white-space:nowrap;*/
+		font-size:11px;
+		font-weight: bold; 
+	}
+	.helpdesk td, th { 
+		padding: 6px; 
+		border: 1px solid #ccc; 
+		/*text-align: left; */
+	}
+	/* 
+	Max width before this PARTICULAR table gets nasty
+	This query will take effect for any screen smaller than 760px
+	and also iPads specifically.
+	*/
+	
+	
+	/* Helpdesk CSS END */
+	
+	/* CALENDOR */
+	.ajax__calendar_container
+	{
+		width:220px !important
+	}
+	.ajax__calendar_body
+	{
+		width:210px !important;
+	}
+	/* CALENDOR */	
+	/*Leave Request*/
+	.lr_header {
+    background-color: #c7d7e4;
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 0 0 1px;
+    color: #000;
+    font-family: "Open Sans",sans-serif !important;
+    font-size: 11px;
+}
+.border_ltbr {
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 1px;
+    color: #000;
+    font-family: "Open Sans",sans-serif !important;
+    font-size: 11px;
+}
+.emp_gridcmp_b {
+    background-color: #3a6f9f;
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 0 0 1px;
+    color: #fff;
+    font-family: "Open Sans",sans-serif !important;
+    font-size: 11px;
+}
+.ftr_b {
+    background-color: #c7d7e4;
+    border-bottom:1px solid #ccc !important;
+	border:0 none;
+    color: #000;
+    font-family: "Open Sans",sans-serif !important;
+    font-size: 11px;
+}
+.border_r {
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 0 1px 0 0;
+    color: #000;
+    font-family: "Open Sans",sans-serif !important;
+    font-size: 11px;
+}
+.border_tbr {
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 1px 1px 1px 0;
+    color: #000;
+    font-family: "Open Sans",sans-serif !important;
+    font-size: 11px;
+}
+.border_t {
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 1px 0 0;
+    color: #000;
+    font-family: "Open Sans",sans-serif !important;
+    font-size: 11px;
+}
+.border_br {
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 0 1px 1px 0;
+    color: #000;
+    font-family: "Open Sans",sans-serif !important;
+    font-size: 11px;
+}
+.border_tb {
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 1px 0;
+    color: #000;
+    font-family: "Open Sans",sans-serif !important;
+    font-size: 11px;
+}
+.border_b {
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 0 0 1px;
+    color: #000;
+    font-family: "Open Sans",sans-serif !important;
+    font-size: 11px;
+}
+.ftr_ltbr {
+    background-color: #eeeeee;
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 1px;
+    color: #000;
+    font-family: "Open Sans",sans-serif !important;
+    font-size: 11px;
+}
+.ftr_lr {
+    background-color: #eeeeee;
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 0 1px;
+    color: #000;
+    font-family: "Open Sans",sans-serif !important;
+    font-size: 11px;
+}
+.ftr_tbr {
+    background-color: #eeeeee;
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 1px 1px 1px 0;
+    color: #000;
+    font-family: "Open Sans",sans-serif !important;
+    font-size: 11px;
+}
+.ftr_r {
+    background-color: #eeeeee;
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 0 1px 0 0;
+    color: #000;
+    font-family: "Open Sans",sans-serif !important;
+    font-size: 11px;
+}
+.ftr_ltbr {
+    background-color: #eeeeee;
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 1px;
+    color: #000;
+    font-family: "Open Sans",sans-serif !important;
+    font-size: 11px;
+}
+	/*Leave Request*/	

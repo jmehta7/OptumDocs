@@ -1,0 +1,809 @@
+﻿/// <reference path="jquery-1.4.1.min.js" />
+
+//var msgBoxImagePath = "../JS/MessageBox/images/";
+
+var Page = { isvalid: true, errmsg: "" };
+var parentID = "";
+var exceptKeys = { "8": 8, "9": 9, "37": 37, "39": 39 }
+//var exceptKeys = {  "8": 8, "35": 35, "36": 36, "37": 37, "38": 38, "39": 39, "40": 40,"46": 46 } 
+
+/*delete - 46
+backspace - 8
+enter 13
+end - 35
+home - 36
+-> - 37 to 40*/
+
+function setfocus(senderid) {
+    var sender = functions.getElement(senderid);
+    if (sender) {
+        setAsError(sender, true);
+    }
+}
+
+function arrayContains(a, value) {
+    var i = a.length;
+    while (i--) {
+        if (a[i] === value) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function setAsError(sender, isfocus, bg) {
+    if (sender.value == undefined && functions.textOf(sender) == undefined)
+        sender = document.getElementById(sender);
+
+    if (sender && (sender.value != undefined || functions.textOf(sender) != undefined)) {
+        sender.style.color = "red";
+
+        if (bg)
+            sender.style.backgroundColor = "yellow";
+
+        if (isfocus) sender.focus();
+    }
+}
+function setAsClear(sender) {
+    if (sender.value == undefined && functions.textOf(sender) == undefined)
+        sender = document.getElementById(sender);
+
+    if (sender && (sender.value != undefined || functions.textOf(sender) != undefined)) {
+        sender.style.color = "";
+        sender.style.backgroundColor = "";
+    }
+}
+
+
+var Validator = {
+    isValidRule: function (sender, rule, ruleType) {
+        if (ruleType != undefined && ruleType.condtion != undefined) {
+            if (!eval(ruleType.condtion)) return false;
+        }
+
+        if (rule.required == undefined)
+            return (ruleType != undefined && Page.isvalid && !functions.isNullorEmpty(functions.valueOf(sender)));
+        else if (rule.required.condtion == undefined)
+            return (ruleType != undefined && Page.isvalid);
+        else return ((eval(rule.required.condtion) || !functions.isNullorEmpty(functions.valueOf(sender)) && ruleType != undefined));
+    },
+    nextFocus: function (jsonid) {
+        try {
+
+            var jsonstring = functions.valueOf(functions.getElement(jsonid));
+            if (!functions.contains(jsonstring, "{")) jsonstring = "{" + jsonstring + "}";
+
+            eval("jsonInput = " + jsonstring)
+            var Objectid = "";
+
+            for (var Key in jsonInput) {
+                if (jsonInput[Key] == "N")
+                { Objectid = Key; jsonInput[Key] = "Y"; break; }
+            }
+
+            if (Objectid == "") {
+                for (var Key in jsonInput) {
+                    if (Objectid == "") Objectid = Key;
+                    else jsonInput[Key] = "N";
+                }
+            }
+
+            $("#" + jsonid).html(JSON.stringify(jsonInput));
+
+            functions.setFocus(Objectid);
+
+        }
+        catch (ex) { }
+
+    },
+    setError: function (sender, msg, markAsError, UniquemsgID) {
+
+        if (UniquemsgID != undefined) {
+            var UniqueObject = document.getElementById(UniquemsgID + "_UniquemsgID");
+
+            if (UniqueObject == undefined) {
+                var newSpan = document.createElement('span');
+                newSpan.setAttribute("id", UniquemsgID + "_UniquemsgID");
+                newSpan.style.cssText = "display:none";
+                newSpan.innerHTML = sender.id + ":'N'";
+                document.body.appendChild(newSpan);
+
+                Page.errmsg += "<tr><td style='cursor:pointer;' onclick = \"Validator.nextFocus('" + UniquemsgID + "_UniquemsgID')\";>"
+                + msg + "</td></tr>";
+            }
+            else $(UniqueObject).html(UniqueObject.innerHTML + "," + sender.id + ":'N'");
+        }
+        else Page.errmsg += "<tr><td style='cursor:pointer;' onclick = \"functions.setFocus('" + sender.id + "')\";>" + msg + "</td></tr>";
+
+        if (markAsError)
+            sender.className = sender.className.replace("normal", "error");
+
+    },
+    clearErrors: function () {
+        Page.errmsg = "";
+        $(document).find("[id$='_UniquemsgID']").remove();
+        Validator.getResult();
+    },
+    clear: function (sender) {
+        sender.className = sender.className.replace("error", "normal");
+    },
+    getResult: function () {
+
+        var errorContainer = functions.getElement("errorContainer");
+
+        if (Page.errmsg.length != 0) {
+            if (errorContainer == undefined) {
+                $("body").append(
+                    '<div id="errorContainer">' +
+                        '<div style="width:100%;border-bottom:10px solid #961313;" align="center">' +
+                            '<img id="errorContentclose" src="' + msgBoxImagePath + 'floatingfooter_butn.png" alt="" style="cursor:pointer;margin-bottom:-5px;" /> ' +
+                        '</div>' +
+                        '<div  id="errorContent" style="max-height:120px;overflow:auto;">  ' +
+                        '</div> ' +
+                    '</div>');
+
+                $(functions.getElement("errorContentclose")).click(function () {
+
+                    this.src =
+                    functions.contains(this.src, "floatingfooter_butn_active.png")
+                            ? msgBoxImagePath + "floatingfooter_butn.png"
+                            : msgBoxImagePath + "floatingfooter_butn_active.png";
+
+                    $(functions.getElement("errorContent")).slideToggle();
+                });
+            }
+
+            var errorContent = functions.getElement("errorContent");
+
+            errorContent.innerHTML = '<table>' + Page.errmsg + '</table>';
+            Page.errmsg = ""; Page.isvalid = true;
+
+            $(errorContent).slideUp("fast");
+            $(errorContent).slideDown();
+
+            return false;
+
+        } else { $(errorContainer).slideUp("fast").remove(); return true; }
+
+    },
+    inputBoxValidation: function (rule, sender) {
+        Page.isvalid = true;
+        /* validation for required */
+        if (Validator.isValidRule(sender, rule, rule.required)) {
+            if (functions.isNullorEmpty(sender.value))
+            { Validator.setError(sender, rule.required.message, true); return; }
+        }
+
+        /* validation for Email ID*/
+        if (Validator.isValidRule(sender, rule, rule.email)) {
+            if (!functions.isEmail(sender.value))
+            { Validator.setError(sender, rule.email.message, true); return; }
+        }
+
+        /* validation for Date */
+        if (Validator.isValidRule(sender, rule, rule.date)) {
+            if (!functions.isDate(sender.value))
+            { Validator.setError(sender, rule.date.message, true); return; }
+        }
+
+        /* validation for number */
+        if (Validator.isValidRule(sender, rule, rule.number)) {
+            if (!functions.isNumber(sender.value))
+            { Validator.setError(sender, rule.number.message, true); return; }
+        }
+
+        /* validation for Password format */
+        if (Validator.isValidRule(sender, rule, rule.passwordFormat)) {
+            if (!functions.ispasswordFormat(sender.value))
+            { Validator.setError(sender, rule.passwordFormat.message, true); return; }
+        }
+
+        /* validation for DateCompare */
+        if (Validator.isValidRule(sender, rule, rule.dateCompare)) {
+            if (!functions.dateCompare(sender.value, rule.dateCompare.compareto, rule.dateCompare.operator))
+            { Validator.setError(sender, rule.dateCompare.message, true); return; }
+        }
+
+        /* validation for numberCompare */
+        if (Validator.isValidRule(sender, rule, rule.numberCompare)) {
+
+            if (!functions.numberCompare(sender.value, rule.numberCompare.compareto, rule.numberCompare.operator))
+            { Validator.setError(sender, rule.numberCompare.message, true); return; }
+        }
+
+        /* validation for string Compare*/
+        if (Validator.isValidRule(sender, rule, rule.equal)) {
+            if (!functions.isequal(sender.value, rule.equal.compareto, true))
+            { Validator.setError(sender, rule.equal.message, rule.equal.sender); return; }
+        }
+
+        /* validation for string Compare*/
+        if (Validator.isValidRule(sender, rule, rule.notequal)) {
+            if (functions.isequal(sender.value, rule.notequal.compareto, true))
+            { Validator.setError(sender, rule.notequal.message, rule.notequal.sender); return; }
+        }
+    }
+
+};
+
+
+(function ($) {
+    $.fn.Validate = function () {
+        try {
+            var rules = $(this).get(0);
+            Page.errmsg = "";
+            for (var Key in rules) {
+                var isvalidRule = true;
+                var sender = functions.getElement(Key);
+                var rule = rules[Key];
+
+
+                if (rule.condtion != undefined) isvalidRule = eval(rule.condtion);
+
+                if (isvalidRule) {
+                    var nodeName = sender.nodeName.toUpperCase();
+                    //functions.clearError(sender);
+
+                    if (nodeName == "INPUT") Validator.inputBoxValidation(rule, sender);
+                }
+            }
+
+
+            return Validator.getResult();
+        }
+        catch (er) { return false; }
+
+    };
+})(jQuery);
+
+//errorContainerImagePath = "images/";
+
+var functions =
+{
+
+    replaceAll: function (value, find, replace) {
+        while (value.indexOf(find) != -1) {
+            value = value.replace(new RegExp(find, 'g'), replace);
+        }
+
+        return value;
+    }, contains: function (selector, searchstring, matchcase) {
+        if (!matchcase) { searchstring = searchstring.toUpperCase(); selector = selector.toUpperCase(); }
+
+        return (selector.toString().indexOf(searchstring) != -1);
+    },
+    focus: function (senderid) {
+        try {
+            functions.getElement(senderid).focus();
+        }
+        catch (e) {
+        }
+    },
+    getElement: function (senderid, parent) {
+
+        if (parent == undefined) parent = document;
+
+        var objects = $(parent).find("[id$='_" + senderid + "']");
+
+        if (objects.length == 0) return $(parent).find("#" + senderid)[0];
+        else if (objects.length == 1) return objects[0];
+        else if (objects.length > 1) return functions.getobject(objects);
+    },
+    getobject: function (objects) {
+        var min = objects[0];
+        for (var i = 1; i < objects.length; i++) {
+            if (objects[i].id.length < min.id.length)
+                min = objects[i];
+        }
+        return min;
+
+    },
+    isElement: function (sender) {
+        return sender.nodeName != undefined;
+    },
+    setFocus: function (senderid) {
+        try {
+            $("#" + senderid).focus();
+
+        } catch (ex) { }
+    },
+    ekeyCode: function (e) {
+        return (e.charCode) ? e.charCode : ((e.which) ? e.which : e.keyCode);
+    },
+    numericKeyPress: function (e, allowdChars) {
+        try {
+            var regx = "1234567890" + (allowdChars ? allowdChars : "");
+            var ekeycode = functions.ekeyCode(e);
+            var chr = String.fromCharCode(ekeycode);
+
+            return regx.indexOf(chr) != -1 || exceptKeys[ekeycode] != undefined;
+
+        } catch (ex) { return false; }
+    },
+    numericBlur: function (sender, allowdChars) {
+        try {
+            var regx = "1234567890" + (allowdChars ? allowdChars : "");
+
+            var svalue = "";
+
+            for (var i = 0; i < sender.value.length; i++) {
+                var chr = sender.value.substr(i, 1);
+                if (regx.indexOf(chr) != -1)
+                    svalue += chr;
+            }
+
+            sender.value = svalue.replace(/^\--/g, '');  //svalue.length == 0 ? "0" : svalue; 
+
+        } catch (ex) { return false; }
+    },
+    AlphaNumericKeyPress: function (e, allowdChars, sender) {
+        try {
+            var regx = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890" + (allowdChars ? allowdChars : "");
+            var ekeycode = functions.ekeyCode(e);
+            var chr = String.fromCharCode(ekeycode);
+            var mlen = true;
+            
+            //if (ekeycode = 13) chr="\r\n";
+
+            //if (sender && sender.maxLength)
+            //    mlen = sender.value.length < functions.toNumber(sender.maxLength);
+
+            var retVal = (regx.indexOf(chr) != -1 || exceptKeys[ekeycode] != undefined);
+
+            return (regx.indexOf(chr) != -1 || exceptKeys[ekeycode] != undefined) && mlen;
+
+        } catch (ex) { return false; }
+    },
+    AlphaNumericBlur: function (sender, allowdChars) {
+        try {
+            var regx = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890" + (allowdChars ? allowdChars : "");
+
+            var svalue = "";
+
+            for (var i = 0; i < sender.value.length; i++) {
+                var chr = sender.value.substr(i, 1);
+                if (regx.indexOf(chr) != -1)
+                    svalue += chr;
+            }
+
+            sender.value = svalue.replace(/--/g, ''); // svalue.length == 0 ? "0" : svalue;
+
+            //if (sender.maxLength && functions.toNumber(sender.value.length) > functions.toNumber(sender.maxLength) && functions.toNumber(sender.maxLength) > 0)
+            //    sender.value = sender.value.substr(0, functions.toNumber(sender.maxLength));
+
+        } catch (ex) { return false; }
+    },
+    AlphaKeyPress: function (e, allowdChars, sender) {
+            try {
+                var regx = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" + (allowdChars ? allowdChars : "");
+                var ekeycode = functions.ekeyCode(e);
+                var chr = String.fromCharCode(ekeycode);
+                var mlen = true;
+            
+                //if (ekeycode = 13) chr="\r\n";
+
+                //if (sender && sender.maxLength)
+                //    mlen = sender.value.length < functions.toNumber(sender.maxLength);
+
+                var retVal = (regx.indexOf(chr) != -1 || exceptKeys[ekeycode] != undefined);
+
+                return (regx.indexOf(chr) != -1 || exceptKeys[ekeycode] != undefined) && mlen;
+
+            } catch (ex) { return false; }
+        },
+    AlphaBlur: function (sender, allowdChars) {
+    try {
+        var regx = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" + (allowdChars ? allowdChars : "");
+
+        var svalue = "";
+
+        for (var i = 0; i < sender.value.length; i++) {
+            var chr = sender.value.substr(i, 1);
+            if (regx.indexOf(chr) != -1)
+                svalue += chr;
+        }
+
+        sender.value = svalue.replace(/--/g, ''); // svalue.length == 0 ? "0" : svalue;
+
+        //if (sender.maxLength && functions.toNumber(sender.value.length) > functions.toNumber(sender.maxLength) && functions.toNumber(sender.maxLength) > 0)
+        //    sender.value = sender.value.substr(0, functions.toNumber(sender.maxLength));
+
+    } catch (ex) { return false; }
+},
+    valueOf: function (sender) {
+        if (!(sender.value || sender.innerHTML))
+            sender = functions.getElement(sender);
+
+        return (sender.value ? sender.value : sender);
+
+    },
+    textOf: function (sender) {
+        return (sender.textContent ? sender.textContent : sender.innerText);
+
+    },
+    ltrim: function (value) {
+        var l = 0;
+        while (l < value.length && value[l] == ' ') { l++; }
+        return value.substring(l, value.length);
+    },
+    rtrim: function (value) {
+        var r = value.length - 1;
+        while (r > 0 && value[r] == ' ') { r -= 1; }
+        return value.substring(0, r + 1);
+    },
+    trim: function (value) {
+        return String(value).replace(/^\s+|\s+$/g, '');
+    },
+    isStartWith: function (value, swith, matchCase) {
+        try {
+            if (swith.length > value.length) return false;
+            else {
+                if (!matchCase) {
+                    value = value.toLowerCase();
+                    swith = swith.toLowerCase();
+                }
+
+                svalue = value.substring(0, swith.length);
+                return swith == svalue;
+            }
+        }
+        catch (ex) { return false; }
+    },
+    isEndWith: function (value, ewith, matchCase) {
+
+        try {
+            if (ewith.length > value.length) return false;
+            else {
+
+                if (!matchCase) {
+                    value = value.toLowerCase();
+                    ewith = ewith.toLowerCase();
+                }
+
+                svalue = value.substring((value.length - ewith.length));
+                return ewith == svalue;
+            }
+        }
+        catch (ex) { return false; }
+    },
+    leastOf: function (value1, valu2) {
+        return (value1 > value2 ? value2 : value1);
+    },
+    isNullorEmpty: function (value) {
+        try {
+            if (value != undefined)
+                value = functions.trim(value.replace(/(&nbsp;)*/g, ""));
+
+            return (value == undefined || value.length == 0);
+        }
+        catch (ex) { return true; }
+    },
+    isNull: function (value, newValue) {
+        try { return (isNullorEmpty(value) ? newValue : value); }
+        catch (ex) { return false; }
+    },
+    isNumber: function (value) {
+        try {
+            value = functions.trim(value);
+            return !isNaN(value) && !functions.isNullorEmpty(value);
+        }
+        catch (ex) { return false; }
+    },
+    isInt: function (value) {
+        try {
+            value = functions.trim(value);
+            return !isNaN(value) && !functions.isNullorEmpty(value) && !functions.contains(value, ".");
+        }
+        catch (ex) { return false; }
+    },
+    toNumber: function (value) {
+        try {
+            value = functions.trim(value);
+            if (!isNaN(value) && !functions.isNullorEmpty(value)) return parseFloat(value);
+            else return null;
+        }
+        catch (ex) { return null; }
+    },
+    numberCompare: function (value, comparetoValue, operator) {
+        try {
+            var num1 = functions.toNumber(value);
+            var num2 = functions.toNumber(comparetoValue);
+
+            operator = String(operator).replace("&lt;", "<").replace("&gt;", ">");
+
+            if (operator == ">") return num1 > num2;
+            else if (operator == "<") return num1 < num2;
+            else if (operator == "==") return num1 == num2;
+            else if (operator == ">=") return num1 >= num2;
+            else if (operator == "<=") return num1 <= num2;
+            else return false;
+
+        }
+        catch (er) { return false; }
+    },
+    //    isDate: function (value) {
+    //        try {
+    //            var day = parseInt(value.substr(0, 2));
+    //            var month = parseInt(value.substr(3, 2));
+    //            var year = parseInt(value.substr(6, 4));
+    // 
+
+    //            var d = new Date(year, month - 1, day);  // month is 0 to 11
+
+    //            // compare the value back to orginal values then it is a valid date.
+    //            return !(d.getFullYear() != year || d.getMonth() != month - 1 || d.getDate() != day || year.length != 4)
+    //        }
+    //        catch (ex) { return false; }
+    //    },
+    isDate: function (value, format) {
+        try {
+            var day; var month; var year;
+            if (format == "dd/MM/yyyy") {
+                var sdate = value.split("/")
+                if (sdate.length != 3 || (sdate[0]).length != 2 || (sdate[1]).length != 2 || (sdate[2]).length != 4) return false;
+
+                day = (sdate[0]);
+                month = (sdate[1]);
+                year = (sdate[2]);
+            }
+            else if (format == "MM/dd/yyyy") {
+                var sdate = value.split("/")
+                if (sdate.length != 3 || (sdate[0]).length != 2 || (sdate[1]).length != 2 || (sdate[2]).length != 4) return false;
+
+                day = (sdate[1]);
+                month = (sdate[0]);
+                year = (sdate[2]);
+            }
+            else if (format == "dd MMM yyyy") {
+                var _Mon = { "JAN": 1, "FEB": 2, "MAR": 3, "APR": 4, "MAY": 5, "JUN": 6, "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12 };
+                value = value.toUpperCase();
+
+                var sdate = value.split(" ")
+                if (sdate.length != 3) return false;
+
+                day = sdate[0];
+                month = _Mon[sdate[1]];
+                year = (sdate[2])
+
+            } else if (format == "dd") {
+                var _Mon = { "JAN": 1, "FEB": 2, "MAR": 3, "APR": 4, "MAY": 5, "JUN": 6, "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12 };
+                value = value.toUpperCase();
+
+                var sdate = value.split(" ")
+                if (sdate.length != 3) return false;
+
+                day = sdate[0];
+                month = _Mon[sdate[1]];
+                year = (sdate[2])
+
+            }
+            else return false;
+
+            var d = new Date(year, month - 1, day);  // month is 0 to 11
+
+            // compare the value back to orginal values then it is a valid date.
+            return !(d.getFullYear() != year || d.getMonth() != month - 1 || d.getDate() != day || String(year).length != 4)
+        }
+        catch (ex) { return false; }
+    },
+    toDate: function (value, format) {
+        try {
+            var day; var month; var year;
+
+            if (format == "dd/MM/yyyy") {
+                var sdate = value.split("/")
+                if (sdate.length != 3) return null;
+
+                day = parseInt(sdate[0], 10);
+                month = parseInt(sdate[1], 10);
+                year = parseInt(sdate[2], 10);
+            }
+            else if (format == "MM/dd/yyyy") {
+                var sdate = value.split("/")
+                if (sdate.length != 3) return null;
+
+                day = parseInt(sdate[1], 10);
+                month = parseInt(sdate[0], 10);
+                year = parseInt(sdate[2], 10);
+            }
+            else if (format == "dd MMM yyyy") {
+                var _Mon = { "JAN": 1, "FEB": 2, "MAR": 3, "APR": 4, "MAY": 5, "JUN": 6, "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12 };
+                value = value.toUpperCase();
+
+                var sdate = value.split(" ")
+                if (sdate.length != 3) return null;
+
+                day = sdate[0];
+                month = _Mon[sdate[1]];
+                year = (sdate[2])
+
+            }
+            else return null;
+
+            var d = new Date(year, month - 1, day);  // month is 0 to 11
+
+            // compare the value back to orginal values then it is a valid date.
+            if (!(d.getFullYear() != year || d.getMonth() != month - 1 || d.getDate() != day || String(year).length != 4))
+                return d;
+            else null;
+        }
+        catch (ex) { return null; }
+    },
+    dateCompare: function (value, comparetoValue, operator) {
+        try {
+            var date1 = functions.toDate(value);
+            var date2 = functions.toDate(comparetoValue);
+
+            operator = String(operator).replace("&lt;", "<").replace("&gt;", ">");
+
+            if (operator == ">") return date1 > date2;
+            else if (operator == "<") return date1 < date2;
+            else if (operator == "==") return date1 == date2;
+            else if (operator == ">=") return date1 >= date2;
+            else if (operator == "<=") return date1 <= date2;
+            else return false;
+        }
+        catch (er) { return false; }
+    },
+    isMonthName: function (value, format) {
+        try {
+            value = value.toUpperCase();
+            var _Month = "JANUARY,FEBRUARY,MARCH,APRIL,MAY,JUNE,JULY,AUGUST,SEPTEMBER,OCTOBER,NOVEMBER,DECEMBER";
+            var _Mon = "JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC";
+
+            if (format == "MONTH")
+                return _Month.indexOf(value) != -1;
+            else if (format == "MON")
+                return _Mon.indexOf(value) != -1;
+            else return false;
+        }
+        catch (ex) { return false; }
+    },
+    isYear: function (value) {
+        try {
+            if (functions.isNumber(value))
+                return (parseInt(value) > 1900);
+            else return false;
+        }
+        catch (ex) { return false; }
+    }, 
+    isTime: function (timeValue)
+    {
+            try
+            {
+            var timeParts = timeValue.split(':');
+                
+            if (timeParts.length != 2) return false;
+            else if (timeParts[0].length != 2 || !functions.isNumber(timeParts[0])) return false;
+            else if (timeParts[1].length != 2 || !functions.isNumber(timeParts[1])) return false;
+            else if (functions.toNumber(timeParts[0]) > 23 || functions.toNumber(timeParts[0]) < 0) return false;
+            else if (functions.toNumber(timeParts[1]) > 59 || functions.toNumber(timeParts[1]) < 0) return false; 
+                
+            }
+            catch(ex){return false;}
+
+            return true;
+    },
+    timeToMins: function (timeValue) {
+        try {
+            var timeParts = timeValue.split(':');
+            var totalMins = 0;
+
+            if (functions.isTimeFormat(timeValue))
+            {
+                totalMins = (functions.toNumber(timeParts[0]) * 60) + functions.toNumber(timeParts[1]);
+            }
+
+            return totalMins;
+
+        }
+        catch (ex) { return 0; }
+    },
+    formatMins: function (minutes) {
+        try {
+            var minutes = parseInt(minutes);
+
+            var hrs = parseInt(minutes / 60);
+            var minute = minutes % 60;
+
+            var formatHrs = hrs.toString().length == 1 ? "0" + hrs.toString() : hrs.toString();
+            var formatMins = minute.toString().length == 1 ? "0" + minute.toString() : minute.toString();
+
+            return formatHrs + ":" + formatMins;
+
+        }
+        catch (ex) { return "00:00"; }
+    },
+    isTimeFormat: function (timeValue) {
+        try {
+            var timeParts = timeValue.split(':');
+
+            if (timeParts.length != 2) return false;
+            else if (timeParts[0].length < 2 || !functions.isNumber(timeParts[0])) return false;
+            else if (timeParts[1].length != 2 || !functions.isNumber(timeParts[1])) return false;
+            else if (functions.toNumber(timeParts[0]) < 0) return false;
+            else if (functions.toNumber(timeParts[1]) > 59 || functions.toNumber(timeParts[1]) < 0) return false;
+
+        }
+        catch (ex) { return false; }
+
+        return true;
+    },
+    isequal: function (compare, compareto) {
+        try {
+            return compare == compareto;
+
+        }
+        catch (er) { return false; }
+    },
+    isEmail: function (email) {
+        try {
+            if (email.indexOf("..") != -1 || email.indexOf(".@") != -1 || email.indexOf("@.") != -1 || email.indexOf("._.") != -1)
+                return false;
+
+            var amps = email.split('@');
+            if (amps.length != 2 || (amps[0])[0] == "." || functions.isNullorEmpty(amps[0]) || functions.isNullorEmpty(amps[1]))
+                return false;
+
+            var dots = amps[1].split('.');
+
+            if (dots[0].length == 0) return false;
+
+            if (dots.length != 2 && dots.length != 3) return false;
+
+            if (dots.length == 2 && (functions.isNullorEmpty(dots[0]) || functions.isNullorEmpty(dots[1])))
+                return false;
+
+            if (dots.length == 3 && (functions.isNullorEmpty(dots[0]) || functions.isNullorEmpty(dots[1]) || functions.isNullorEmpty(dots[2])))
+                return false;
+
+            return true;
+
+        }
+        catch (er) { return false; }
+    },
+    gridItemCheckedchange: function (sender, headerIndex) {
+        try {
+
+            $("#" + sender.id + " input").each(function () {
+                if (this.type == "checkbox") {
+                    $(this).click(function () {
+                        if (this.value.toLowerCase() == "selectall")
+                            functions.gridHeaderCheck(sender);
+                        else
+                            functions.gridItemCheck(sender);
+                    });
+                }
+            });
+        }
+        catch (er) { }
+    },
+    gridItemCheck: function (sender) {
+        try {
+
+            var rows = sender.getElementsByTagName("tr");
+            var hedchkbox = rows[0].cells[0].getElementsByTagName("input")[0];
+            if (hedchkbox.type == "checkbox") hedchkbox.checked = false;
+        }
+        catch (er) { }
+    },
+    gridHeaderCheck: function (sender) {
+        try {
+
+            var rows = sender.getElementsByTagName("tr");
+            var hedchkbox = rows[0].cells[0].getElementsByTagName("input")[0];
+
+            if (hedchkbox) {
+                for (var i = 1; i < rows.length; i++) {
+                    var checkBox = rows[i].cells[0].getElementsByTagName("input")[0];
+
+                    if (checkBox != undefined && checkBox.type == "checkbox") checkBox.checked = hedchkbox.checked;
+                }
+            }
+        }
+        catch (er) { }
+    }
+
+}
+

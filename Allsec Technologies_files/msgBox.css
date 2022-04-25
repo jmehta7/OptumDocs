@@ -1,0 +1,242 @@
+﻿ /*start error container layer
+*******************************/
+#errorContent td
+{
+    text-align:left; 
+    font-family: Arial, Helvetica, sans-serif; font-size:12px; color: #961313; 
+    line-height:15px;
+    
+}
+#errorContent 
+ {    
+    z-index: 300; 
+    font-size:13px;  
+    
+    font-family: Arial, Helvetica, sans-serif; font-size:12px; 
+    padding:10px 10px 10px 35px;
+    
+    background-position: 10px 10px;
+    background-repeat: no-repeat; 
+    background-image: url("../images/cross-circle.png"); 
+    background-color: #FACFCF;
+    
+    border: 1px solid #961313; 
+    border-top:none;
+    border-bottom:none; 
+    display:none;
+    
+    max-height:50%;
+    overflow:auto;  
+    
+    -webkit-box-shadow: 0 0 6px #d88e90;
+    -moz-box-shadow: 0 0 6px #d88e90;
+    box-shadow: 0 0 6px #d88e90;
+}   
+
+#errorContainer
+{
+    /*left:20%; right:20%; bottom: 0; position:fixed;
+    width:60%;  */
+    
+    left:30%; right:30%; bottom: 0; position:fixed;
+    width:40%; 
+    
+    border-radius:5px 5px 0px 0px; 
+    z-index: 900;
+} 
+
+.error { border:1px solid #bd4247; color: #bd4247;}
+.error:focus 
+{   
+    border-color: #983538; 
+    -webkit-box-shadow: 0 0 6px #d88e90;
+    -moz-box-shadow: 0 0 6px #d88e90;
+    box-shadow: 0 0 6px #d88e90;
+    background-color:Yellow;
+    color: #bd4247;
+} 
+.error:focus * 
+{color: #bd4247;}
+
+
+.cellid { width:15px;
+	      height:15px;
+          cursor:pointer;
+          padding:2px; }
+
+.cellid:hover
+{ 
+    background: #950707; 
+	color:#fff;
+	
+	-webkit-border-radius: 12px;
+	-moz-border-radius: 12px;
+	border-radius: 12px; 
+	
+     -webkit-box-shadow: 0 0 6px #d88e90;
+    -moz-box-shadow: 0 0 6px #d88e90;
+    box-shadow: 0 0 6px #d88e90;
+}
+
+.cellid:hover { background: #950707;}
+
+/*end error container layer*/
+
+
+
+
+
+
+
+
+
+
+div.msgBox
+{
+    padding: 4px 10px 4px 10px;
+    position: fixed;
+    z-index: 1003;
+    font-family:Verdana;
+    width: 430px;
+    min-height:160px;
+    color: #00335e;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    -moz-box-shadow: 0px 0px 11px #000000;
+    -webkit-box-shadow: 0px 0px 11px #000000;
+    box-shadow: 0px 0px 11px #000000;
+}
+div.msgBoxBackGround
+{
+    top:0;
+    left:0;
+    position:fixed;
+    padding:0;
+    margin:0;
+    width:100%;
+    height:100%;   
+    background-color:#000000;
+    opacity:0.9;
+    z-index:1002;
+}
+div.msgBoxTitle
+{
+    padding:5px 0 5px 0;
+    font-variant:small-caps;
+    font-size:16pt;
+    font-weight:lighter;
+    color:#00335e;
+    width:100%;
+    border-bottom : 1px solid #002c5f;
+}
+div.msgBoxImage
+{
+    margin:20px 5px 0 5px;
+    display:inline-block;
+    float:left;
+    height:75px;
+    width:75px;
+}
+div.msgBoxImage img
+{
+    height:75px;
+    width:75px;
+}
+div.msgBoxContainer
+{
+	width: 100%;
+    /*overflow: auto;*/
+}
+div.msgBoxContent
+{
+    font-size:12px;
+    margin:0 3px 6px 3px;
+    display:inline-block; 	
+	float:left;	
+    height:90px;
+	    width: 75%;
+    overflow: auto;
+    
+} 
+div.msgBoxContent_lrge
+{
+    font-size:12px;
+    margin:0 3px 6px 3px;
+    display:inline-block; 
+	width:87%;
+	float:right;
+	overflow:auto;
+	max-height:300px;
+    min-height:90px;
+    /* width:319px; */
+} 
+ 
+div.msgBoxContent p, div.msgBoxContent_lrge p
+{
+    padding:0;
+    margin:0;
+    display: table;
+    height: 100%;
+    width: 100%;
+}
+
+div.msgBoxContent span, div.msgBoxContent_lrge span
+{
+    display: table-cell;
+    vertical-align: middle;
+    color: #00335e;
+}
+
+div.msgBoxButtons
+{
+    display:inline-block;
+    width:100%;
+    text-align:right;
+}
+div.msgBoxButtons input[type='button']
+{
+    cursor:pointer;
+    margin:2px;
+    height:35px;
+    width:90px;
+    border:1px solid #AFAFAF;
+    background-color:#004076;
+    color:#FFFFFF;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+}
+div.msgBoxButtons input[type='button']:hover
+{
+    background-color:#00549c;
+    color:White;
+}
+div.msgBoxButtons input[type='button']:active
+{
+    background-color:#AAAAAA;
+    color:White;
+}
+
+div.msgBoxInputs
+{
+    margin:0 auto;
+    padding-top:2px;
+    padding-bottom:2px;
+    margin-top:5px;
+    width:195px;
+}
+div.msgInput input[type='text'],div.msgInput input[type='password']
+{
+    padding:4px;
+    border:1px solid #DFDFDF;
+    color:#2f2f2f;
+    width:180px;
+}
+div.msgInput text
+{
+    color:#2f2f2f;
+    font-size:10pt;
+}
+ 
+

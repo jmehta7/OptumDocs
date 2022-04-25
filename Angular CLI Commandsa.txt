@@ -1,0 +1,16 @@
+commands
+Angular CLI - 
+
+ng build --prod
+
+ng build --prod
+
+ng serve --port 4201
+
+npm start
+
+npm install
+
+ng build --configuration=dev
+
+ ng test  --include="src/app/modules/group/components/content/changelog/*.spec.ts
